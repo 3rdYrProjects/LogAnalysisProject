@@ -1,1 +1,1 @@
-# LogAnalysisProject
+# Log Analysis Tool For Security Events
