@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Analysis Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Log Analysis Dashboard</h1>
+      </header>
+
+      <section class="summary">
+        <h2>Summary</h2>
+        <p id="total-logs">Total Logs: Loading...</p>
+        <ul id="activity-summary"></ul>
+      </section>
+
+      <section class="logs">
+        <h2>All Logs</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>User ID</th>
+              <th>IP Address</th>
+              <th>Activity</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

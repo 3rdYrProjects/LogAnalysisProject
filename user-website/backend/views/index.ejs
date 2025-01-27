@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Penetration Testing Blog</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/blogs">Blogs</a></li>
+        <% if (isAuthenticated) { %>
+        <li><a href="/logs">Logs</a></li>
+        <li>
+          <form method="GET" action="/auth/logout" style="display: inline">
+            <button
+              type="submit"
+              style="border: none; background: none; cursor: pointer"
+            >
+              Logout
+            </button>
+          </form>
+        </li>
+        <% } else { %>
+        <li><a href="/auth/login">Login</a></li>
+        <li><a href="/auth/signup">Signup</a></li>
+        <% } %>
+      </ul>
+    </nav>
+
+    <!-- Blog Container -->
+    <div class="container" id="blog-container"></div>
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title">Blog Title</h2>
+        <p id="modal-description"></p>
+        <div class="comments">
+          <h3>Comments</h3>
+          <div class="add-comment">
+            <input type="text" placeholder="Add a comment" id="comment-input" />
+            <button onclick="addComment()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>
