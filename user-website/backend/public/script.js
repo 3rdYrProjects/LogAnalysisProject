@@ -35,81 +35,55 @@ const blogContainer = document.getElementById("blog-container")
 const modal = document.getElementById("modal")
 const modalTitle = document.getElementById("modal-title")
 const modalDescription = document.getElementById("modal-description")
-const commentInput = document.getElementById("comment-input")
-const commentsData = {} // Object to store comments for each blog
 
+// Variable to track login status
+let isLoggedIn = false
+let currentUsername = "" // Store the current username if logged in
+
+// Function to fetch current logged-in user info
+async function fetchUser() {
+  try {
+    const response = await fetch("/auth/current-user")
+    const data = await response.json()
+    if (data.username) {
+      isLoggedIn = true
+      currentUsername = data.username
+    }
+  } catch (err) {
+    console.error("Failed to fetch user info:", err)
+  }
+}
+
+// Function to render blog cards on the homepage
 function renderBlogs() {
   blogs.forEach((blog) => {
     const card = document.createElement("div")
     card.className = "blog-card"
     card.innerHTML = `
-        <img src="${blog.image}" alt="Blog Image">
-        <div class="content">
-          <h3>${blog.title}</h3>
-          <p>${blog.description}</p>
-        </div>
-      `
+      <img src="${blog.image}" alt="Blog Image">
+      <div class="content">
+        <h3>${blog.title}</h3>
+        <p>${blog.description}</p>
+      </div>
+    `
     card.onclick = () => showBlogDetails(blog.id)
     blogContainer.appendChild(card)
   })
 }
 
+// Function to show blog details
 function showBlogDetails(id) {
   const blog = blogs.find((b) => b.id === id)
   modalTitle.textContent = blog.title
   modalDescription.textContent = blog.details
-  modal.dataset.blogId = id // Store the current blog ID in the modal
   modal.style.display = "flex"
-
-  // Clear and display comments for the selected blog
-  const commentSection = document.querySelector(".comments")
-  const existingComments = commentSection.querySelectorAll(".comment")
-  existingComments.forEach((comment) => comment.remove())
-
-  if (commentsData[id]) {
-    commentsData[id].forEach((commentText) => {
-      const newComment = document.createElement("div")
-      newComment.className = "comment"
-      newComment.textContent = commentText
-      commentSection.insertBefore(
-        newComment,
-        commentSection.querySelector(".add-comment")
-      )
-    })
-  }
 }
 
+// Function to close the modal
 function closeModal() {
   modal.style.display = "none"
 }
 
-function addComment() {
-  const commentText = commentInput.value.trim()
-  if (commentText) {
-    const blogId = modal.dataset.blogId
-    if (!commentsData[blogId]) {
-      commentsData[blogId] = []
-    }
-    commentsData[blogId].push(commentText)
-
-    const commentSection = document.querySelector(".comments")
-    const newComment = document.createElement("div")
-    newComment.className = "comment"
-    newComment.textContent = commentText
-    commentSection.insertBefore(
-      newComment,
-      commentSection.querySelector(".add-comment")
-    )
-
-    commentInput.value = ""
-  }
-}
-
-// Add event listener to submit comment on pressing "Enter"
-commentInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    addComment()
-  }
-})
-
+// Initial function calls
+fetchUser()
 renderBlogs()

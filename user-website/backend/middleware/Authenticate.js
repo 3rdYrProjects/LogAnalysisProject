@@ -1,35 +1,20 @@
 const jwt = require("jsonwebtoken")
-function verifyToken(req, res, next) {
-  const token = req.header("Authorization")
-  if (!token) return res.status(401).json({ error: "Access denied" })
+const SECRET = "qur3ur83ut8u8" // Secret key used for signing the JWT
+
+// Middleware to verify token
+// Middleware to verify the token and get the user
+const verifyToken = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1] // Extract token from Authorization header
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" })
+  }
+
   try {
-    const jwt = require("jsonwebtoken")
-
-    function verifyToken(req, res, next) {
-      // Retrieve the token from cookies
-      const token = req.cookies.authToken
-      if (!token) {
-        return res
-          .status(401)
-          .json({ error: "Access denied. No token provided." })
-      }
-
-      try {
-        // Verify the token
-        const decoded = jwt.verify(token, "qur3ur83ut8u8")
-        req.userId = decoded.userId // Store the userId for later use
-        next() // Proceed to the next middleware
-      } catch (error) {
-        res.status(401).json({ error: "Invalid token." })
-      }
-    }
-
-    module.exports = verifyToken
-    decoded = jwt.verify(token, "qur3ur83ut8u8")
-    req.userId = decoded.userId
+    const decoded = jwt.verify(token, SECRET)
+    req.user = decoded // Attach decoded user info to request
     next()
-  } catch (error) {
-    res.status(401).json({ error: "Invalid token" })
+  } catch (err) {
+    res.status(401).json({ error: "Invalid or expired token" })
   }
 }
 

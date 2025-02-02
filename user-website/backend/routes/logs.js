@@ -30,7 +30,6 @@ router.get("/", async (req, res) => {
   }
 })
 
-// Create a new log entry
 router.post("/", async (req, res) => {
   try {
     const { username, activity, details } = req.body

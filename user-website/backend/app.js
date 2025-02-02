@@ -5,29 +5,29 @@ const path = require("path")
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+const dotenv = require("dotenv")
 const Log = require("./models/Log")
-const verifyToken = require("./middleware/Authenticate")
-
 const authRoutes = require("./routes/auth")
 const logRoutes = require("./routes/logs")
+const commentRoutes = require("./routes/commentRoutes")
+
+dotenv.config() // Load environment variables
 
 const app = express()
+const SECRET = process.env.JWT_SECRET || "qur3ur83ut8u8"
 
-// Secret Key for JWT
-const SECRET = "qur3ur83ut8u8" // Replace with your actual secret key
-
-// Middleware to parse JSON and URL-encoded bodies
+// Middleware
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-app.use(cors())
+app.use(cors({ origin: "http://localhost:3000", credentials: true }))
 
 // View Engine Setup
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
-
 app.use(express.static(path.join(__dirname, "public")))
 
+// Connect to MongoDB
 mongoose
   .connect("mongodb://localhost:27017/userWebsite", {
     useNewUrlParser: true,
@@ -36,51 +36,37 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err))
 
-// Track user requests
+// Rate-Limiting Middleware (DoS Detection)
 const requestCounts = {}
-
-// Middleware for rate-limiting and DoS detection
-const RATE_LIMIT = 100 // Max requests per minute
-const TIME_WINDOW = 60 * 1000 // 1 minute in milliseconds
+const RATE_LIMIT = 100
+const TIME_WINDOW = 60 * 1000 // 1 minute
 
 app.use((req, res, next) => {
-  const ip = req.ip // Use IP to track requests
+  const ip = req.ip
   const currentTime = Date.now()
 
-  if (!requestCounts[ip]) {
-    requestCounts[ip] = []
-  }
-
-  // Filter out requests older than TIME_WINDOW
+  if (!requestCounts[ip]) requestCounts[ip] = []
   requestCounts[ip] = requestCounts[ip].filter(
     (timestamp) => timestamp > currentTime - TIME_WINDOW
   )
-
-  // Add current request timestamp
   requestCounts[ip].push(currentTime)
 
   if (requestCounts[ip].length > RATE_LIMIT) {
-    // Possible DoS attack detected
-    const logDetails = {
+    Log.create({
       activity: "DoS Attack Attempt",
-      details: `Possible DoS attack detected from IP: ${ip}. Exceeded ${RATE_LIMIT} requests in 1 minute.`,
+      details: `Possible DoS attack detected from IP: ${ip}.`,
       ipAddress: ip,
-    }
-
-    // Log the detected DoS attempt
-    Log.create(logDetails)
-      .then(() => console.log("DoS attempt logged"))
-      .catch((err) => console.error("Failed to log DoS attempt:", err))
+    }).catch((err) => console.error("Failed to log DoS attempt:", err))
 
     return res
       .status(429)
-      .json({ error: "Too many requests. Please try again later." })
+      .json({ error: "Too many requests. Try again later." })
   }
 
   next()
 })
 
-// Middleware to check user authentication
+// Authentication Middleware
 app.use((req, res, next) => {
   const token = req.cookies.authToken
   if (token) {
@@ -88,14 +74,11 @@ app.use((req, res, next) => {
       const decoded = jwt.verify(token, SECRET)
       res.locals.isAuthenticated = true
       res.locals.username = decoded.username
-      console.log("User authenticated:", decoded)
     } catch (err) {
       res.locals.isAuthenticated = false
-      console.error("Token verification failed:", err.message)
     }
   } else {
     res.locals.isAuthenticated = false
-    console.log("No token found in cookies.")
   }
   next()
 })
@@ -103,21 +86,18 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoutes)
 app.use("/logs", logRoutes)
+// app.use("/blog", blogRoutes)
+app.use("/comments", commentRoutes)
 
-// Home Page
-app.get("/blog", verifyToken, (req, res) => {
-  res.render("index")
-})
-app.get("/", verifyToken, (req, res) => {
-  res.render("index")
-})
+// Pages
+app.get("/", (req, res) => res.render("index"))
 app.get("/signup", (req, res) => res.render("signup"))
-
 app.get("/login", (req, res) => res.render("login"))
 
+// 404 Page
 app.use((req, res) => res.status(404).render("404"))
 
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () =>
   console.log(`Server running at http://localhost:${PORT}`)
 )
