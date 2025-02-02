@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${log.ipAddress || "N/A"}</td>
         <td>${log.activity}</td>
         <td>${log.details}</td>
+        <td>${log.status || "N/A"}</td>
+        <td>${log.transferred !== undefined ? log.transferred : "N/A"}</td>
       `
       logsTable.appendChild(row)
     })

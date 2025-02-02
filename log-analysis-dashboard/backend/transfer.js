@@ -28,8 +28,11 @@ async function transferLogs() {
         details: log.details,
         transferred: true,
       }))
+
+      // Insert logs into the logAnalysis database
       await logAnalysisDb.collection("logs").insertMany(formattedLogs)
 
+      // Mark logs as transferred in the user website database
       const logIds = logs.map((log) => log._id)
       await userLogsDb
         .collection("logs")
