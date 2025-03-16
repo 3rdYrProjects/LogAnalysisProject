@@ -74,3 +74,17 @@ router.post("/", async (req, res) => {
 })
 
 module.exports = router
+// Paginated Logs
+router.get("/paginated", async (req, res) => {
+  const { page = 1, limit = 10 } = req.query; // Default values
+  try {
+    const logs = await Log.find()
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+    const total = await Log.countDocuments();
+    res.status(200).json({ logs, total, page, totalPages: Math.ceil(total / limit) });
+  } catch (error) {
+    console.error("Error fetching paginated logs:", error);
+    res.status(500).json({ error: "Error fetching paginated logs" });
+  }
+});
