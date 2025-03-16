@@ -1,7 +1,6 @@
 // Define the base API URL for the backend
 const API_BASE = "http://localhost:4000" // Log Analysis API URL
 
-// Signup Form Submission
 document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   e.preventDefault()
 
@@ -17,7 +16,6 @@ document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   if (response.ok) {
     alert("Signup successful")
 
-    // Create log entry for signup action
     const logResponse = await sendLog(
       "User Signup",
       `User ${username} signed up successfully.`

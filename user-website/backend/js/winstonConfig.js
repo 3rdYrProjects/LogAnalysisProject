@@ -2,15 +2,16 @@ const winston = require("winston")
 const axios = require("axios")
 
 const logTransport = new winston.transports.Http({
-  host: "localhost", // Ensure this is correct
-  port: 4000, // Check if your backend is listening on this port
+  host: "localhost",
+  port: 4000,
   path: "/logs",
   level: "info",
   headers: { "Content-Type": "application/json" },
   formatter: (log) => {
-    console.log("Sending log to backend:", log) // Debugging line to see the log being sent
+    console.log("Sending log to backend:", log)
     return JSON.stringify({
-      userId: log.userId,
+      _id: log._id.toString(),
+      userId,
       activity: log.activity,
       details: log.details,
       timestamp: log.timestamp,

@@ -29,12 +29,82 @@ const blogs = [
     details:
       "OWASP Top 10 is a standard awareness document for developers and security professionals. Learn how to mitigate these vulnerabilities.",
   },
+  {
+    id: 4,
+    title: "Phishing Attacks: How to Spot and Avoid Them",
+    description:
+      "Learn how to identify phishing attempts and protect yourself from scams.",
+    image:
+      "https://blog.ipleaders.in/wp-content/uploads/2020/08/170509-did-you-fall-for-the-Google-phishing-scam.jpg",
+    details:
+      "Phishing is a common cyber attack where attackers trick users into revealing sensitive information. This blog explains how to stay safe.",
+  },
+  {
+    id: 5,
+    title: "Introduction to Penetration Testing",
+    description:
+      "A beginner's guide to penetration testing and its importance in cybersecurity.",
+    image: "https://insecsys.com/images/penetration-testing.png",
+    details:
+      "Penetration testing involves simulating cyber attacks to identify vulnerabilities in a system. Learn how it works and why it's essential.",
+  },
+  {
+    id: 6,
+    title: "Ransomware: Prevention and Recovery",
+    description:
+      "Understand ransomware attacks and how to prevent or recover from them.",
+    image:
+      "https://media.licdn.com/dms/image/v2/D4D10AQE8qBYiZA3Czw/image-shrink_800/image-shrink_800/0/1732661116132?e=2147483647&v=beta&t=dVhVQGMEXwfaK-uvIAPiUGXQcF_rr27SgiehdvOoQaQ",
+    details:
+      "Ransomware is a type of malware that encrypts files and demands payment for their release. This blog covers prevention and recovery strategies.",
+  },
+  {
+    id: 7,
+    title: "Securing IoT Devices",
+    description:
+      "Learn how to secure Internet of Things (IoT) devices from cyber threats.",
+    image: "https://cdn.invicti.com/statics/img/blogposts/iot-security.png",
+    details:
+      "IoT devices are increasingly targeted by hackers. This blog provides tips on securing your IoT devices.",
+  },
+  {
+    id: 8,
+    title: "Zero Trust Security Model",
+    description:
+      "An overview of the Zero Trust security model and its implementation.",
+    image:
+      "https://media.licdn.com/dms/image/v2/D5612AQGPDPyH9Hk-1g/article-cover_image-shrink_600_2000/article-cover_image-shrink_600_2000/0/1721914033755?e=2147483647&v=beta&t=FakY3sjdSr1cMdrvZb4TjoK3dlis0VgUIUQnezA9gko",
+    details:
+      "Zero Trust is a security framework that assumes no user or device is trusted by default. Learn how to implement it in your organization.",
+  },
+  {
+    id: 9,
+    title: "Data Encryption Best Practices",
+    description:
+      "A guide to encrypting data to protect it from unauthorized access.",
+    image:
+      "https://cdn.prod.website-files.com/664e6b29f3ed49c2317db2f2/665e2e968ee27aa9fde3adc1_647674eab869affb3582b92c_asymmetric%2520encryption.webp",
+    details:
+      "Data encryption is a critical component of cybersecurity. This blog covers best practices for encrypting sensitive data.",
+  },
+  {
+    id: 10,
+    title: "Social Engineering Attacks",
+    description:
+      "Learn about social engineering techniques and how to defend against them.",
+    image:
+      "https://www.dragonspears.com/hubfs/images/blog/avoid-these-four-social-engineering-attacks-in-your-organization-1260x630px.png",
+    details:
+      "Social engineering exploits human psychology to gain access to systems or data. This blog explains common techniques and how to protect yourself.",
+  },
 ]
 
 const blogContainer = document.getElementById("blog-container")
 const modal = document.getElementById("modal")
 const modalTitle = document.getElementById("modal-title")
 const modalDescription = document.getElementById("modal-description")
+const searchBar = document.getElementById("search-bar")
+const searchButton = document.querySelector(".search-btn")
 
 // Variable to track login status
 let isLoggedIn = false
@@ -54,9 +124,10 @@ async function fetchUser() {
   }
 }
 
-// Function to render blog cards on the homepage
-function renderBlogs() {
-  blogs.forEach((blog) => {
+// Function to render blog cards with filtering
+function renderBlogs(filteredBlogs = blogs) {
+  blogContainer.innerHTML = "" // Clear existing content
+  filteredBlogs.forEach((blog) => {
     const card = document.createElement("div")
     card.className = "blog-card"
     card.innerHTML = `
@@ -71,6 +142,17 @@ function renderBlogs() {
   })
 }
 
+// Function to filter blogs based on search query
+function filterBlogs() {
+  const query = searchBar.value.toLowerCase()
+  const filtered = blogs.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(query) ||
+      blog.description.toLowerCase().includes(query)
+  )
+  renderBlogs(filtered)
+}
+
 // Function to show blog details
 function showBlogDetails(id) {
   const blog = blogs.find((b) => b.id === id)
@@ -83,6 +165,16 @@ function showBlogDetails(id) {
 function closeModal() {
   modal.style.display = "none"
 }
+
+// Add event listener to the search button
+searchButton.addEventListener("click", filterBlogs)
+
+// Add event listener to the search bar for "Enter" key
+searchBar.addEventListener("keyup", (event) => {
+  if (event.key === "Enter") {
+    filterBlogs()
+  }
+})
 
 // Initial function calls
 fetchUser()

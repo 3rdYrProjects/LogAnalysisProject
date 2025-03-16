@@ -11,23 +11,20 @@ const authRoutes = require("./routes/auth")
 const logRoutes = require("./routes/logs")
 const commentRoutes = require("./routes/commentRoutes")
 
-dotenv.config() // Load environment variables
+dotenv.config()
 
 const app = express()
 const SECRET = process.env.JWT_SECRET || "qur3ur83ut8u8"
 
-// Middleware
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(cors({ origin: "http://localhost:3000", credentials: true }))
 
-// View Engine Setup
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"))
 app.use(express.static(path.join(__dirname, "public")))
 
-// Connect to MongoDB
 mongoose
   .connect("mongodb://localhost:27017/userWebsite", {
     useNewUrlParser: true,
@@ -36,10 +33,9 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err))
 
-// Rate-Limiting Middleware (DoS Detection)
 const requestCounts = {}
 const RATE_LIMIT = 100
-const TIME_WINDOW = 60 * 1000 // 1 minute
+const TIME_WINDOW = 60 * 1000
 
 app.use((req, res, next) => {
   const ip = req.ip
@@ -66,7 +62,6 @@ app.use((req, res, next) => {
   next()
 })
 
-// Authentication Middleware
 app.use((req, res, next) => {
   const token = req.cookies.authToken
   if (token) {
@@ -89,12 +84,10 @@ app.use("/logs", logRoutes)
 // app.use("/blog", blogRoutes)
 app.use("/comments", commentRoutes)
 
-// Pages
 app.get("/", (req, res) => res.render("index"))
 app.get("/signup", (req, res) => res.render("signup"))
 app.get("/login", (req, res) => res.render("login"))
 
-// 404 Page
 app.use((req, res) => res.status(404).render("404"))
 
 const PORT = process.env.PORT || 3000

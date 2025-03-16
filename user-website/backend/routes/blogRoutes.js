@@ -1,5 +1,5 @@
 const express = require("express")
-const Comment = require("../models/Comment") // Import the Comment model
+const Comment = require("../models/Comment")
 const router = express.Router()
 
 // POST Comment Logic
@@ -10,8 +10,6 @@ router.post("/comment", async (req, res) => {
     if (!blogId || !username || !comment) {
       return res.status(400).json({ error: "All fields are required" })
     }
-
-    // Save the comment in the database
     const newComment = await Comment.create({ blogId, username, comment })
     res
       .status(201)

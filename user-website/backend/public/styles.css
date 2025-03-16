@@ -61,7 +61,7 @@ nav .logo-glitch {
   animation: glitch 2s infinite;
 }
 
-nav .logo-glitch::before,
+/* nav .logo-glitch::before,
 nav .logo-glitch::after {
   content: attr(data-text);
   position: absolute;
@@ -71,13 +71,13 @@ nav .logo-glitch::after {
   height: 100%;
   color: #00ffcc;
   opacity: 0.8;
-}
+} */
 
-nav .logo-glitch::before {
+/* nav .logo-glitch::before {
   left: 2px;
   text-shadow: -2px 0 #ff00aa;
   animation: glitch-anim 1s infinite;
-}
+} */
 
 nav .logo-glitch::after {
   left: -2px;
@@ -92,9 +92,15 @@ nav .logo-highlight {
 nav ul {
   list-style: none;
   display: flex;
+  align-items: center;
   gap: 25px;
   margin: 0;
   padding: 0;
+}
+
+nav ul li {
+  display: flex;
+  align-items: center;
 }
 
 nav ul li a {
@@ -109,6 +115,54 @@ nav ul li a:hover {
   color: #ff00aa;
 }
 
+/* Search Container */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#search-bar {
+  width: 200px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 2px solid #00ffcc;
+  border-radius: 5px;
+  background-color: #111;
+  color: #00ffcc;
+  outline: none;
+  transition: all 0.3s;
+}
+
+#search-bar::placeholder {
+  color: #00ffcc;
+  opacity: 0.7;
+}
+
+#search-bar:focus {
+  border-color: #ff00aa;
+  box-shadow: 0 0 8px rgba(255, 0, 170, 0.5);
+}
+
+.search-btn {
+  background-color: #00ffcc;
+  color: #000;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-btn:hover {
+  background-color: #ff00aa;
+}
+
+.search-btn i {
+  font-size: 16px;
+}
+
+/* Logout, Login, and Signup Buttons */
 nav .logout-btn,
 .login-btn,
 .signup-btn {
@@ -264,58 +318,6 @@ nav .login-btn:hover,
 
 .modal-content .close:hover {
   color: #ff00aa;
-}
-
-/* Comments Section */
-.comments {
-  margin-top: 20px;
-}
-
-.comments h3 {
-  font-size: 20px;
-  color: #00ffcc;
-  margin-bottom: 15px;
-}
-
-.comment-list .comment {
-  background: #1a1a1a;
-  border-left: 4px solid #00ffcc;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  font-size: 16px;
-  color: #e0e0e0;
-}
-
-.add-comment {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.add-comment input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #00ffcc;
-  background: #111;
-  color: #e0e0e0;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.add-comment button {
-  padding: 10px 20px;
-  background-color: #00ffcc;
-  color: #000;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.add-comment button:hover {
-  background-color: #00e6b8;
 }
 
 /* Animations */
