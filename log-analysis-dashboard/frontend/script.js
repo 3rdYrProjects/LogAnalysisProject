@@ -1,15 +1,20 @@
-const API_BASE = "http://localhost:4000";
+// === UPDATED script.js ===
+const API_BASE = "http://localhost:4000"
 
-document.addEventListener("DOMContentLoaded", async () => {
+let allLogs = []
+
+async function fetchSummaryAndRender() {
   try {
-    // Fetch Summary of logs
-    const summaryResponse = await fetch(`${API_BASE}/logs/summary`);
-    const summaryData = await summaryResponse.json();
+    const summaryResponse = await fetch(`${API_BASE}/logs/summary`)
+    const summaryData = await summaryResponse.json()
 
-    document.getElementById("total-logs").textContent = `Total Logs: ${summaryData.totalLogs}`;
+    document.getElementById(
+      "total-logs"
+    ).textContent = `Total Logs: ${summaryData.totalLogs}`
 
-    // Chart: Activity Summary
-    const activityChart = document.getElementById("activity-chart").getContext("2d");
+    const activityChart = document
+      .getElementById("activity-chart")
+      .getContext("2d")
     new Chart(activityChart, {
       type: "bar",
       data: {
@@ -22,10 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
         ],
       },
-    });
+    })
 
-    // Chart: Status Summary
-    const statusChart = document.getElementById("status-chart").getContext("2d");
+    const statusChart = document.getElementById("status-chart").getContext("2d")
     new Chart(statusChart, {
       type: "doughnut",
       data: {
@@ -38,27 +42,101 @@ document.addEventListener("DOMContentLoaded", async () => {
           },
         ],
       },
-    });
-
-    // Fetch All Logs
-    const logsResponse = await fetch(`${API_BASE}/logs`);
-    const logsData = await logsResponse.json();
-
-    const logsTable = document.getElementById("logs-table");
-    logsData.forEach((log) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="p-2">${new Date(log.timestamp).toLocaleString()}</td>
-        <td class="p-2">${log.userId || "N/A"}</td>
-        <td class="p-2">${log.ipAddress || "N/A"}</td>
-        <td class="p-2">${log.activity}</td>
-        <td class="p-2">${log.details}</td>
-        <td class="p-2">${log.status || "N/A"}</td>
-        <td class="p-2">${log.transferred ? "Yes" : "No"}</td>
-      `;
-      logsTable.appendChild(row);
-    });
-  } catch (error) {
-    console.error("Error loading data:", error);
+    })
+  } catch (err) {
+    console.error("Summary error:", err)
   }
-});
+}
+
+async function fetchAndRenderLogs() {
+  try {
+    const logsResponse = await fetch(`${API_BASE}/logs`)
+    allLogs = await logsResponse.json()
+    renderLogsTable(allLogs)
+  } catch (err) {
+    console.error("Logs error:", err)
+  }
+}
+
+function renderLogsTable(logs) {
+  const logsTable = document.getElementById("logs-table")
+  logsTable.innerHTML = ""
+  logs.forEach((log) => {
+    const row = document.createElement("tr")
+    row.innerHTML = `
+      <td>${log._id}</td>
+      <td>${new Date(log.timestamp).toLocaleString()}</td>
+      <td>${log.level || "info"}</td>
+      <td>${log.service || "web"}</td>
+      <td>${log.method || "GET"}</td>
+      <td>${log.path || "/"}</td>
+      <td>${log.status || 200}</td>
+      <td>${log.message || log.details}</td>
+    `
+    logsTable.appendChild(row)
+  })
+}
+
+function applyFilters() {
+  const userInput = document.getElementById("filter-user").value.toLowerCase()
+  const statusInput = document
+    .getElementById("filter-status")
+    .value.toLowerCase()
+
+  const filtered = allLogs.filter((log) => {
+    return (
+      (!userInput ||
+        (log.userId && log.userId.toLowerCase().includes(userInput))) &&
+      (!statusInput ||
+        (log.status && log.status.toLowerCase().includes(statusInput)))
+    )
+  })
+  renderLogsTable(filtered)
+}
+
+function exportCSV() {
+  const rows = [
+    [
+      "ID",
+      "Timestamp",
+      "Level",
+      "Service",
+      "Method",
+      "Path",
+      "StatusCode",
+      "Message",
+    ],
+    ...allLogs.map((l) => [
+      l._id,
+      new Date(l.timestamp).toLocaleString(),
+      l.level || "",
+      l.service || "web",
+      l.method || "",
+      l.path || "",
+      l.statusCode || "",
+      l.message || l.details || "",
+    ]),
+  ]
+  const csvContent =
+    "data:text/csv;charset=utf-8," + rows.map((e) => e.join(",")).join("\n")
+  const link = document.createElement("a")
+  link.setAttribute("href", encodeURI(csvContent))
+  link.setAttribute("download", "logs.csv")
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchSummaryAndRender()
+  fetchAndRenderLogs()
+
+  document.getElementById("filter-user").addEventListener("input", applyFilters)
+  document
+    .getElementById("filter-status")
+    .addEventListener("input", applyFilters)
+  document.getElementById("download-csv").addEventListener("click", exportCSV)
+
+  // Auto-refresh logs every 10 seconds
+  setInterval(fetchAndRenderLogs, 10000)
+})
