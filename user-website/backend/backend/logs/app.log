@@ -1,0 +1,15 @@
+2025-02-01T12:09:52.073Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:10:02.413Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:10:40.666Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:10:45.202Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:11:24.078Z [INFO] User logged in {"userId":"67926d50b7d867791658208c","activity":"User Login","ipAddress":"::1","details":"User admin logged in successfully.","transferred":false}
+2025-02-01T12:12:48.856Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:13:34.510Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:13:57.021Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:14:02.149Z [ERROR] Login error {"error":"secretOrPrivateKey must have a value"}
+2025-02-01T12:15:11.120Z [INFO] User logged in {"userId":"67926d50b7d867791658208c","activity":"User Login","ipAddress":"::1","details":"User admin logged in successfully.","transferred":false}
+2025-02-01T12:16:51.365Z [INFO] User logged out {"userId":"67926d50b7d867791658208c","activity":"User Logout","ipAddress":"::1","details":"User admin logged out successfully.","transferred":false}
+2025-02-01T12:17:50.599Z [INFO] User logged in {"userId":"67926d50b7d867791658208c","activity":"User Login","ipAddress":"::1","details":"User admin logged in successfully.","transferred":false}
+2025-02-01T12:23:03.415Z [INFO] User logged out {"userId":"67926d50b7d867791658208c","activity":"User Logout","ipAddress":"::1","details":"User admin logged out successfully.","transferred":false}
+2025-02-01T12:24:32.646Z [INFO] User logged in {"userId":"679258ecb73845149e4dda0e","activity":"User Login","ipAddress":"::1","details":"User test logged in successfully.","transferred":false}
+2025-02-01T12:28:08.192Z [INFO] User logged out {"userId":"679258ecb73845149e4dda0e","activity":"User Logout","ipAddress":"::1","details":"User test logged out successfully.","transferred":false}
