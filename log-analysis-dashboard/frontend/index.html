@@ -10,40 +10,75 @@
     <header>
       <h1>Log Analysis Dashboard</h1>
     </header>
-    <main>
-      <div class="summary">
-        <div class="card" id="total-logs">Total Logs: 0</div>
-      </div>
+    <main class="dashboard-layout">
+      <aside class="sidebar">
+        <h3>Filters</h3>
+        <label>Log Level</label>
+        <select id="filter-level">
+          <option value="">All</option>
+          <option value="info">Info</option>
+          <option value="warn">Warn</option>
+          <option value="error">Error</option>
+        </select>
 
-      <div class="charts">
-        <canvas id="activity-chart" style="height: 250px"></canvas>
-        <canvas id="status-chart" style="height: 250px"></canvas>
-      </div>
+        <label>HTTP Method</label>
+        <select id="filter-method">
+          <option value="">All</option>
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
 
-      <div class="filters">
-        <input type="text" id="filter-user" placeholder="Filter by User ID" />
-        <input type="text" id="filter-status" placeholder="Filter by Status" />
-        <button id="download-csv">Download CSV</button>
-      </div>
+        <label>Status Code</label>
+        <input type="text" id="filter-status" placeholder="e.g. 200" />
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Time</th>
-              <th>Level</th>
-              <th>Service</th>
-              <th>Method</th>
-              <th>Path</th>
-              <th>Status</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody id="logs-table"></tbody>
-        </table>
-      </div>
+        <label>Request Path</label>
+        <input type="text" id="filter-path" placeholder="/api/users" />
+      </aside>
+
+      <section class="main-content">
+        <div class="top-bar">
+          <input
+            type="text"
+            id="search-box"
+            placeholder="Search logs (e.g. userId, message)"
+          />
+          <select id="date-range">
+            <option value="all">All time</option>
+            <option value="1">Last 1 day</option>
+            <option value="3" selected>Last 3 days</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+          </select>
+
+          <button id="refresh-btn">Refresh</button>
+        </div>
+
+        <div class="charts">
+          <canvas id="activity-chart"></canvas>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>IP</th>
+                <th>Time</th>
+                <th>Level</th>
+                <th>Method</th>
+                <th>Path</th>
+                <th>Status</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody id="logs-table"></tbody>
+          </table>
+        </div>
+      </section>
     </main>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
   </body>

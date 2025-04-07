@@ -1,142 +1,149 @@
-// === UPDATED script.js ===
 const API_BASE = "http://localhost:4000"
-
 let allLogs = []
 
-async function fetchSummaryAndRender() {
-  try {
-    const summaryResponse = await fetch(`${API_BASE}/logs/summary`)
-    const summaryData = await summaryResponse.json()
+async function fetchLogs() {
+  const res = await fetch(`${API_BASE}/logs`)
+  allLogs = await res.json()
+  applyAllFiltersAndRender()
+}
 
-    document.getElementById(
-      "total-logs"
-    ).textContent = `Total Logs: ${summaryData.totalLogs}`
+function applyAllFiltersAndRender() {
+  const level = document.getElementById("filter-level").value
+  const method = document.getElementById("filter-method").value
+  const status = document.getElementById("filter-status").value.trim()
+  const path = document.getElementById("filter-path").value.trim()
+  const search = document.getElementById("search-box").value.toLowerCase()
+  const rangeValue = document.getElementById("date-range").value
+  let startDate = null
 
-    const activityChart = document
-      .getElementById("activity-chart")
-      .getContext("2d")
-    new Chart(activityChart, {
-      type: "bar",
-      data: {
-        labels: summaryData.activities.map((a) => a._id),
-        datasets: [
-          {
-            label: "Activities",
-            data: summaryData.activities.map((a) => a.count),
-            backgroundColor: "rgba(54, 162, 235, 0.6)",
-          },
-        ],
-      },
-    })
+  if (rangeValue !== "all") {
+    const days = parseInt(rangeValue)
+    startDate = new Date()
+    startDate.setDate(startDate.getDate() - days)
+  }
 
-    const statusChart = document.getElementById("status-chart").getContext("2d")
-    new Chart(statusChart, {
-      type: "doughnut",
-      data: {
-        labels: summaryData.statuses.map((s) => s._id),
-        datasets: [
-          {
-            label: "Statuses",
-            data: summaryData.statuses.map((s) => s.count),
-            backgroundColor: ["#36A2EB", "#FF6384", "#FFCE56"],
-          },
-        ],
-      },
-    })
-  } catch (err) {
-    console.error("Summary error:", err)
+  const filtered = allLogs.filter((log) => {
+    const logTime = new Date(log.timestamp)
+    return (
+      (!level || log.level === level) &&
+      (!method || log.method === method) &&
+      (!status || log.status.toString().includes(status)) &&
+      (!path || (log.path && log.path.includes(path))) &&
+      (!search ||
+        (log.message && log.message.toLowerCase().includes(search)) ||
+        (log.userId && log.userId.toLowerCase().includes(search))) &&
+      (startDate ? logTime >= startDate : true)
+    )
+  })
+
+  renderTable(filtered)
+  renderChart(filtered)
+}
+
+function getLevelColor(level) {
+  switch (level) {
+    case "error":
+      return "var(--red)"
+    case "warn":
+      return "var(--orange)"
+    case "info":
+      return "var(--blue)"
+    case "debug":
+      return "var(--gray)"
+    default:
+      return "var(--gray)"
   }
 }
 
-async function fetchAndRenderLogs() {
-  try {
-    const logsResponse = await fetch(`${API_BASE}/logs`)
-    allLogs = await logsResponse.json()
-    renderLogsTable(allLogs)
-  } catch (err) {
-    console.error("Logs error:", err)
-  }
+function getStatusColor(status) {
+  const code = parseInt(status)
+  if (code >= 200 && code < 300) return "var(--green)"
+  if (code >= 300 && code < 400) return "var(--blue)"
+  if (code >= 400 && code < 500) return "var(--red)"
+  if (code >= 500) return "var(--red)"
+  return "var(--gray)"
 }
 
-function renderLogsTable(logs) {
-  const logsTable = document.getElementById("logs-table")
-  logsTable.innerHTML = ""
+function renderTable(logs) {
+  const tableBody = document.getElementById("logs-table")
+  tableBody.innerHTML = ""
   logs.forEach((log) => {
     const row = document.createElement("tr")
     row.innerHTML = `
       <td>${log._id}</td>
+      <td>${log.ipAddress}</td>
       <td>${new Date(log.timestamp).toLocaleString()}</td>
-      <td>${log.level || "info"}</td>
-      <td>${log.service || "web"}</td>
-      <td>${log.method || "GET"}</td>
-      <td>${log.path || "/"}</td>
-      <td>${log.status || 200}</td>
-      <td>${log.message || log.details}</td>
+      <td><span class="badge" style="background-color: ${getLevelColor(
+        log.level
+      )}">${log.level}</span></td>
+      <td>${log.method}</td>
+      <td>${log.path}</td>
+      <td><span class="badge" style="background-color: ${getStatusColor(
+        log.status
+      )}">${log.status}</span></td>
+      <td>${log.message || log.details || ""}</td>
     `
-    logsTable.appendChild(row)
+    tableBody.appendChild(row)
   })
 }
 
-function applyFilters() {
-  const userInput = document.getElementById("filter-user").value.toLowerCase()
-  const statusInput = document
-    .getElementById("filter-status")
-    .value.toLowerCase()
+let chartInstance
+function renderChart(logs) {
+  const methodCounts = logs.reduce((acc, log) => {
+    acc[log.method] = (acc[log.method] || 0) + 1
+    return acc
+  }, {})
 
-  const filtered = allLogs.filter((log) => {
-    return (
-      (!userInput ||
-        (log.userId && log.userId.toLowerCase().includes(userInput))) &&
-      (!statusInput ||
-        (log.status && log.status.toLowerCase().includes(statusInput)))
-    )
+  const labels = Object.keys(methodCounts)
+  const data = Object.values(methodCounts)
+
+  const ctx = document.getElementById("activity-chart").getContext("2d")
+  if (chartInstance) chartInstance.destroy()
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "HTTP Method Count",
+          data,
+          backgroundColor: "#2563eb",
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1 },
+        },
+      },
+    },
   })
-  renderLogsTable(filtered)
-}
-
-function exportCSV() {
-  const rows = [
-    [
-      "ID",
-      "Timestamp",
-      "Level",
-      "Service",
-      "Method",
-      "Path",
-      "StatusCode",
-      "Message",
-    ],
-    ...allLogs.map((l) => [
-      l._id,
-      new Date(l.timestamp).toLocaleString(),
-      l.level || "",
-      l.service || "web",
-      l.method || "",
-      l.path || "",
-      l.statusCode || "",
-      l.message || l.details || "",
-    ]),
-  ]
-  const csvContent =
-    "data:text/csv;charset=utf-8," + rows.map((e) => e.join(",")).join("\n")
-  const link = document.createElement("a")
-  link.setAttribute("href", encodeURI(csvContent))
-  link.setAttribute("download", "logs.csv")
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetchSummaryAndRender()
-  fetchAndRenderLogs()
+  fetchLogs()
+  ;[
+    "filter-level",
+    "filter-method",
+    "filter-status",
+    "filter-path",
+    "search-box",
+    "date-range",
+  ].forEach((id) => {
+    document
+      .getElementById(id)
+      .addEventListener("input", applyAllFiltersAndRender)
+  })
 
-  document.getElementById("filter-user").addEventListener("input", applyFilters)
-  document
-    .getElementById("filter-status")
-    .addEventListener("input", applyFilters)
-  document.getElementById("download-csv").addEventListener("click", exportCSV)
-
-  // Auto-refresh logs every 10 seconds
-  setInterval(fetchAndRenderLogs, 10000)
+  document.getElementById("refresh-btn").addEventListener("click", fetchLogs)
 })
