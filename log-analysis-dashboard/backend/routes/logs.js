@@ -2,7 +2,6 @@ const express = require("express")
 const mongoose = require("mongoose")
 const router = express.Router()
 
-// ✅ Updated Schema to include method and path
 const Log =
   mongoose.models.Log ||
   mongoose.model(
@@ -15,12 +14,16 @@ const Log =
       details: { type: String },
       status: { type: String, default: "unknown" },
       transferred: { type: Boolean, default: false },
-      method: { type: String }, // ✅ Added
-      path: { type: String }, // ✅ Added
+      method: { type: String },
+      path: { type: String },
+      level: {
+        type: String,
+        enum: ["debug", "info", "warn", "error", "fatal"],
+        default: "info",
+      },
     })
   )
 
-// Fetch all logs
 router.get("/", async (req, res) => {
   try {
     const logs = await Log.find()
@@ -31,7 +34,6 @@ router.get("/", async (req, res) => {
   }
 })
 
-// Summary route
 router.get("/summary", async (req, res) => {
   try {
     const totalLogs = await Log.countDocuments()
@@ -48,7 +50,6 @@ router.get("/summary", async (req, res) => {
   }
 })
 
-// ✅ Create log with method and path
 router.post("/", async (req, res) => {
   try {
     const {
@@ -59,6 +60,7 @@ router.post("/", async (req, res) => {
       transferred = false,
       method,
       path,
+      level,
     } = req.body
 
     const log = new Log({
@@ -68,8 +70,9 @@ router.post("/", async (req, res) => {
       details,
       status,
       transferred,
-      method: method || req.method, // fallback if not provided
-      path: path || req.originalUrl, // fallback if not provided
+      method: method || req.method,
+      path: path || req.originalUrl,
+      level,
     })
 
     await log.save()
