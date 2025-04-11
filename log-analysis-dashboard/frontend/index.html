@@ -5,81 +5,342 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Analysis Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
-  <body>
+  <body class="light-mode">
     <header>
-      <h1>Log Analysis Dashboard</h1>
+      <div class="header-content">
+        <h1><i class="fas fa-chart-line"></i> Log Analysis Dashboard</h1>
+        <div class="header-actions">
+          <div class="theme-toggle">
+            <i class="fas fa-sun"></i>
+            <label class="switch">
+              <input type="checkbox" id="theme-toggle" />
+              <span class="slider round"></span>
+            </label>
+            <i class="fas fa-moon"></i>
+          </div>
+          <button id="generate-report" class="btn btn-outline">
+            <i class="fas fa-file-alt"></i> Generate Report
+          </button>
+        </div>
+      </div>
     </header>
+
     <main class="dashboard-layout">
       <aside class="sidebar">
-        <h3>Filters</h3>
-        <label>Log Level</label>
-        <select id="filter-level">
-          <option value="">All</option>
-          <option value="info">Info</option>
-          <option value="warn">Warn</option>
-          <option value="error">Error</option>
-        </select>
+        <div class="sidebar-heading">
+          <h3><i class="fas fa-filter"></i> Filters</h3>
+          <button id="clear-filters" class="btn btn-small">Clear All</button>
+        </div>
 
-        <label>HTTP Method</label>
-        <select id="filter-method">
-          <option value="">All</option>
-          <option value="GET">GET</option>
-          <option value="POST">POST</option>
-          <option value="PUT">PUT</option>
-          <option value="DELETE">DELETE</option>
-        </select>
+        <div class="filter-group">
+          <label for="filter-level">Log Level</label>
+          <select id="filter-level">
+            <option value="">All</option>
+            <option value="debug">Debug</option>
+            <option value="info">Info</option>
+            <option value="warn">Warn</option>
+            <option value="error">Error</option>
+          </select>
+        </div>
 
-        <label>Status Code</label>
-        <input type="text" id="filter-status" placeholder="e.g. 200" />
+        <div class="filter-group">
+          <label for="filter-method">HTTP Method</label>
+          <select id="filter-method">
+            <option value="">All</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
+          </select>
+        </div>
 
-        <label>Request Path</label>
-        <input type="text" id="filter-path" placeholder="/api/users" />
+        <div class="filter-group">
+          <label for="filter-status">Status Code</label>
+          <input type="text" id="filter-status" placeholder="e.g. 200" />
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-path">Request Path</label>
+          <input type="text" id="filter-path" placeholder="/api/users" />
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-userid">User ID</label>
+          <input type="text" id="filter-userid" placeholder="user123" />
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-ip">IP Address</label>
+          <input type="text" id="filter-ip" placeholder="192.168.1.1" />
+        </div>
+
+        <div class="sidebar-heading">
+          <h3><i class="fas fa-shield-alt"></i> Security Alerts</h3>
+        </div>
+        <div id="security-alerts" class="security-alerts">
+          <div class="alert-placeholder">No security alerts detected</div>
+        </div>
       </aside>
 
       <section class="main-content">
         <div class="top-bar">
-          <input
-            type="text"
-            id="search-box"
-            placeholder="Search logs (e.g. userId, message)"
-          />
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              id="search-box"
+              placeholder="Search logs (e.g. userId, message)"
+            />
+          </div>
           <select id="date-range">
             <option value="all">All time</option>
             <option value="1">Last 1 day</option>
             <option value="3" selected>Last 3 days</option>
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
+            <option value="custom">Custom range</option>
           </select>
+          <div id="custom-date-range" class="custom-date-range hidden">
+            <input type="date" id="date-from" />
+            <span>to</span>
+            <input type="date" id="date-to" />
+          </div>
 
-          <button id="refresh-btn">Refresh</button>
+          <div class="action-buttons">
+            <button id="refresh-btn" class="btn">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button id="live-toggle" class="btn btn-outline">
+              <i class="fas fa-bolt"></i> Live Mode: Off
+            </button>
+          </div>
         </div>
 
-        <div class="charts">
-          <canvas id="activity-chart"></canvas>
+        <div class="dashboard-metrics">
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-server"></i></div>
+            <div class="metric-content">
+              <div class="metric-value" id="total-requests">0</div>
+              <div class="metric-label">Total Requests</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="metric-content">
+              <div class="metric-value" id="error-count">0</div>
+              <div class="metric-label">Errors</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-bolt"></i></div>
+            <div class="metric-content">
+              <div class="metric-value" id="response-time">0 ms</div>
+              <div class="metric-label">Avg Response Time</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon"><i class="fas fa-user-shield"></i></div>
+            <div class="metric-content">
+              <div class="metric-value" id="security-issues">0</div>
+              <div class="metric-label">Security Issues</div>
+            </div>
+          </div>
         </div>
 
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>IP</th>
-                <th>Time</th>
-                <th>Level</th>
-                <th>Method</th>
-                <th>Path</th>
-                <th>Status</th>
-                <th>Message</th>
-              </tr>
-            </thead>
-            <tbody id="logs-table"></tbody>
-          </table>
+        <div class="charts-container">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Request Activity Over Time</h3>
+              <select id="time-chart-type">
+                <option value="hour">Hourly</option>
+                <option value="day" selected>Daily</option>
+                <option value="week">Weekly</option>
+              </select>
+            </div>
+            <div class="chart-body">
+              <canvas id="activity-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Log Levels Distribution</h3>
+            </div>
+            <div class="chart-body">
+              <canvas id="levels-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <h3>HTTP Methods & Status Codes</h3>
+          </div>
+          <div class="chart-body methods-status-container">
+            <div class="methods-chart-container">
+              <canvas id="methods-chart"></canvas>
+            </div>
+            <div class="status-chart-container">
+              <canvas id="status-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="log-table-section">
+          <div class="table-header">
+            <h3><i class="fas fa-list"></i> Log Entries</h3>
+            <div class="table-actions">
+              <span id="log-count">0 logs found</span>
+              <select id="page-size">
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
+              </select>
+              <div class="pagination">
+                <button id="prev-page" class="btn btn-icon" disabled>
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span id="page-info">Page 1 of 1</span>
+                <button id="next-page" class="btn btn-icon" disabled>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort="id">
+                    ID <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="ip">
+                    IP <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="time">
+                    Time <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="level">
+                    Level <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="method">
+                    Method <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="path">
+                    Path <i class="fas fa-sort"></i>
+                  </th>
+                  <th class="sortable" data-sort="status">
+                    Status <i class="fas fa-sort"></i>
+                  </th>
+                  <th>Message</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table"></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>
 
+    <!-- Log Detail Modal -->
+    <div id="log-detail-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Log Details</h2>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body" id="log-detail-content">
+          <!-- Content filled by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Generation Modal -->
+    <div id="report-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Generate Report</h2>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="report-form">
+            <div class="form-group">
+              <label for="report-title">Report Title</label>
+              <input
+                type="text"
+                id="report-title"
+                placeholder="Log Analysis Report"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="report-date-range">Date Range</label>
+              <select id="report-date-range">
+                <option value="1">Last 24 hours</option>
+                <option value="3">Last 3 days</option>
+                <option value="7" selected>Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="custom">Custom range</option>
+              </select>
+            </div>
+            <div id="report-custom-date" class="form-group hidden">
+              <label for="report-date-from">From</label>
+              <input type="date" id="report-date-from" />
+              <label for="report-date-to">To</label>
+              <input type="date" id="report-date-to" />
+            </div>
+            <div class="form-group">
+              <label>Include Sections</label>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" id="include-summary" checked />
+                  Executive Summary
+                </label>
+                <label>
+                  <input type="checkbox" id="include-activity" checked />
+                  Activity Trends
+                </label>
+                <label>
+                  <input type="checkbox" id="include-errors" checked />
+                  Error Analysis
+                </label>
+                <label>
+                  <input type="checkbox" id="include-security" checked />
+                  Security Issues
+                </label>
+                <label>
+                  <input type="checkbox" id="include-recommendations" checked />
+                  Recommendations
+                </label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="cancel-report" class="btn btn-outline">
+                Cancel
+              </button>
+              <button type="submit" id="generate-report-btn" class="btn">
+                Generate Report
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script src="script.js"></script>
+    <script src="charts.js"></script>
+    <script src="security.js"></script>
+    <script src="reports.js"></script>
   </body>
 </html>
