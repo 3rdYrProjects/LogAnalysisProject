@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CyberSec Nexus</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <!-- Glitch Background -->
+    <div class="glitch-background"></div>
+
+    <!-- Navbar -->
+    <nav>
+      <div class="logo">
+        <span class="logo-glitch" data-text="CyberSec">CyberSec</span>
+        <span class="logo-highlight">Nexus</span>
+      </div>
+      <ul>
+        <!-- Search Container -->
+        <li class="search-container">
+          <input type="text" id="search-bar" placeholder="Search blogs..." />
+          <button class="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </li>
+        <li><a href="/">Home</a></li>
+        <% if (isAuthenticated) { %>
+        <li><a href="/logs">Logs</a></li>
+        <li>
+          <form method="GET" action="/auth/logout" style="display: inline">
+            <button type="submit" class="logout-btn">Logout</button>
+          </form>
+        </li>
+        <% } else { %>
+        <li><a href="/auth/login" class="login-btn">Login</a></li>
+        <li><a href="/auth/signup" class="signup-btn">Signup</a></li>
+        <% } %>
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title glitch" data-text="Welcome to CyberSec Nexus">
+          Welcome to CyberSec Nexus
+        </h1>
+        <p class="hero-subtitle">
+          Decrypting the future of cybersecurity. Stay ahead of threats.
+        </p>
+      </div>
+    </section>
+
+    <!-- Blog Container -->
+    <div class="container" id="blog-container"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title" class="glitch" data-text="Blog Title">
+          Blog Title
+        </h2>
+        <p id="modal-description"></p>
+      </div>
+    </div>
+    <script src="/script.js"></script>
+  </body>
+</html>
