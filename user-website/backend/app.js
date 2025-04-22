@@ -9,7 +9,8 @@ const dotenv = require("dotenv")
 const Log = require("./models/Log")
 const authRoutes = require("./routes/auth")
 const logRoutes = require("./routes/logs")
-
+const logger = require("./js/winstonConfig")
+const logToAnalysisAPI = require("./middleware/logtransfer")
 dotenv.config()
 
 const app = express()
@@ -66,15 +67,56 @@ app.use((req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, SECRET)
+      req.user = decoded // ✅ This is important!
       res.locals.isAuthenticated = true
       res.locals.username = decoded.username
     } catch (err) {
+      req.user = null
       res.locals.isAuthenticated = false
     }
   } else {
+    req.user = null
     res.locals.isAuthenticated = false
   }
   next()
+})
+
+let blogs = require("./data/blogs")
+
+// Route to get all blogs
+app.get("/blogs", (req, res) => {
+  res.json(blogs)
+})
+
+app.delete("/delete/:id", async (req, res) => {
+  const blogId = parseInt(req.params.id)
+  const blog = blogs.find((b) => b.id === blogId)
+  if (!blog) return res.status(404).send("Blog not found")
+
+  blogs = blogs.filter((b) => b.id !== blogId)
+
+  const logData = {
+    userId: req.user?.userId || "unknown",
+    activity: "Delete Blog",
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"],
+    transferred: false,
+    timestamp: new Date(),
+    method: req.method,
+    path: req.originalUrl,
+    status: 200,
+    level: "info",
+    details: `Blog '${blog.title}' deleted by ${
+      req.user?.username || "unknown"
+    }`,
+  }
+
+  await Log.create(logData)
+  logger.info(logData.details, logData)
+
+  logToAnalysisAPI(logData)
+  console.log("Deleted:", blog.title)
+  res.status(200).send("Blog deleted successfully")
 })
 
 app.use("/auth", authRoutes)

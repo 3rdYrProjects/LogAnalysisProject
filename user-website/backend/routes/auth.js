@@ -5,7 +5,7 @@ const User = require("../models/User")
 const Log = require("../models/Log")
 const logger = require("../js/winstonConfig")
 const limiter = require("./dos_attack")
-const detectSQLInjection = require("./sqlInjectionDetector")
+// const = require("./sqlInjectionDetector")
 const logToAnalysisAPI = require("../middleware/logtransfer")
 
 const router = express.Router()
@@ -43,7 +43,7 @@ router.get("/signup", (req, res) => {
   res.render("signup")
 })
 
-router.post("/signup", detectSQLInjection, async (req, res) => {
+router.post("/signup", async (req, res) => {
   console.log("Request Body:", req.body)
   try {
     const { username, password } = req.body
@@ -107,9 +107,29 @@ router.get("/login", (req, res) => {
   res.render("login")
 })
 
-router.post("/login", detectSQLInjection, async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body
+    const { username, password, company } = req.body
+
+    // 🐝 Honeypot check
+    if (company && company.trim() !== "") {
+      const logData = {
+        userId: "unknown",
+        activity: "Honeypot Triggered - Bot Detected",
+        ipAddress: getClientIp(req),
+        userAgent: req.headers["user-agent"],
+        transferred: false,
+        timestamp: new Date(),
+        requestId: req.id || "N/A",
+        method: req.method,
+        path: req.originalUrl,
+        status: 403,
+        details: `Honeypot triggered on login attempt with username: ${username}`,
+      }
+
+      await logActivity(logData, "warn")
+      return res.status(403).json({ error: "Suspicious activity detected." })
+    }
     const user = await User.findOne({ username })
 
     if (!user || !(await bcrypt.compare(password, user.password))) {

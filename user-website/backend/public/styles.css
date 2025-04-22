@@ -352,3 +352,16 @@ nav .login-btn:hover,
     transform: scale(1);
   }
 }
+.delete-btn {
+  background-color: #e11d48;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #be123c;
+}

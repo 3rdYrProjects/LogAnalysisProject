@@ -1,5 +1,4 @@
-// Define the base API URL for the backend
-const API_BASE = "http://localhost:4000" // Log Analysis API URL
+const API_BASE = "http://localhost:4000"
 
 document.getElementById("signupForm")?.addEventListener("submit", async (e) => {
   e.preventDefault()
