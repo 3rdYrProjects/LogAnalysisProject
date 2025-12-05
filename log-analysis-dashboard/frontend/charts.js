@@ -6,8 +6,8 @@ let timeChart, levelsChart, methodsChart, statusChart
  */
 function initCharts() {
   const isDarkMode = document.body.classList.contains("dark-mode")
-  Chart.defaults.color = isDarkMode ? "#d1d5db" : "#64748b"
-  Chart.defaults.borderColor = isDarkMode ? "#374151" : "#e2e8f0"
+  Chart.defaults.color = "#334155" // cool dark slate
+  Chart.defaults.borderColor = "#cbd5e1" // light border for light mode
 
   // Activity over time chart (line chart)
   const timeCtx = document.getElementById("activity-chart").getContext("2d")
@@ -19,12 +19,12 @@ function initCharts() {
         {
           label: "Requests",
           data: [],
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.1)",
+          borderColor: "#2563eb", // vibrant blue
+          backgroundColor: "rgba(37, 99, 235, 0.1)",
           borderWidth: 2,
           tension: 0.2,
           fill: true,
-          pointBackgroundColor: "#3b82f6",
+          pointBackgroundColor: "#2563eb",
           pointRadius: 3,
         },
       ],
@@ -67,10 +67,10 @@ function initCharts() {
         {
           data: [0, 0, 0, 0],
           backgroundColor: [
-            "var(--blue)",
-            "var(--orange)",
-            "var(--red)",
-            "var(--gray)",
+            "#3b82f6", // info - blue
+            "#facc15", // warn - yellow
+            "#ef4444", // error - red
+            "#94a3b8", // debug - gray
           ],
           borderWidth: 1,
           borderColor: isDarkMode ? "#1f2937" : "#ffffff",
@@ -117,11 +117,11 @@ function initCharts() {
           label: "HTTP Methods",
           data: [],
           backgroundColor: [
-            "var(--blue)",
-            "var(--green)",
-            "var(--orange)",
-            "var(--red)",
-            "var(--purple)",
+            "#0ea5e9", // GET - cyan
+            "#10b981", // POST - green
+            "#f59e0b", // PUT - amber
+            "#ef4444", // DELETE - red
+            "#8b5cf6", // PATCH - violet
           ],
           borderRadius: 6,
         },
@@ -164,10 +164,10 @@ function initCharts() {
           backgroundColor: function (context) {
             const status = context.chart.data.labels[context.dataIndex]
             const code = parseInt(status)
-            if (code >= 200 && code < 300) return "var(--green)"
-            if (code >= 300 && code < 400) return "var(--blue)"
-            if (code >= 400 && code < 500) return "var(--orange)"
-            return "var(--red)"
+            if (code >= 200 && code < 300) return "#10b981" // green
+            if (code >= 300 && code < 400) return "#3b82f6" // blue
+            if (code >= 400 && code < 500) return "#f59e0b" // amber
+            return "#ef4444" // red
           },
           borderRadius: 6,
         },
@@ -385,9 +385,7 @@ function updateChartsTheme() {
 
   // Update doughnut chart border color
   if (levelsChart && levelsChart.data.datasets[0]) {
-    levelsChart.data.datasets[0].borderColor = isDarkMode
-      ? "#1f2937"
-      : "#ffffff"
+    levelsChart.data.datasets[0].borderColor = "#f1f5f9" ? "#1f2937" : "#ffffff"
   }
 
   // Update all charts

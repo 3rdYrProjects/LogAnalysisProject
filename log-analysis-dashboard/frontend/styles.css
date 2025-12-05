@@ -443,11 +443,11 @@ canvas {
   height: 100% !important;
 }
 
-/* Log Table Section */
 .log-table-section {
   background-color: var(--card-bg);
   border-radius: 10px;
   box-shadow: var(--card-shadow);
+  margin-top: 25px;
   margin-bottom: 1.5rem;
   overflow: hidden;
 }
@@ -777,6 +777,52 @@ pre.code-block {
   margin-top: 0.5rem;
   color: var(--text-primary);
   max-height: 200px;
+}
+
+/* Security Analysis in Log Detail */
+.security-analysis {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-left: 3px solid var(--danger);
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.security-risks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-risk-item {
+  display: flex;
+  padding: 10px;
+  background-color: var(--card-bg);
+  border-radius: 5px;
+  box-shadow: var(--card-shadow);
+}
+
+.security-risk-item i {
+  font-size: 1.4rem;
+  color: var(--danger);
+  margin-right: 15px;
+  align-self: center;
+}
+
+.risk-content {
+  flex: 1;
+}
+
+.risk-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--text-primary);
+}
+
+.risk-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 /* Form Styles */

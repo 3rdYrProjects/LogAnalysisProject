@@ -128,8 +128,9 @@ function applyAllFiltersAndRender() {
   // Update the charts
   updateAllCharts(filtered)
 
-  // Check for security issues
-  analyzeSecurityIssues(filtered)
+  // Check for security issues using all logs to ensure detection works
+  console.log("Analyzing all logs for security issues...")
+  analyzeSecurityIssues(allLogs)
 }
 
 /**
@@ -312,6 +313,24 @@ function showLogDetails(logId) {
         <div class="log-detail-label">IP Address</div>
         <div class="log-detail-value">${log.ipAddress || "N/A"}</div>
       </div>
+      ${
+        log.activity
+          ? `
+      <div class="log-detail-row">
+        <div class="log-detail-label">Activity</div>
+        <div class="log-detail-value">${log.activity}</div>
+      </div>`
+          : ""
+      }
+      ${
+        log.requestId
+          ? `
+      <div class="log-detail-row">
+        <div class="log-detail-label">Request ID</div>
+        <div class="log-detail-value">${log.requestId}</div>
+      </div>`
+          : ""
+      }
     </div>
     
     <div class="log-detail-group">
@@ -332,6 +351,15 @@ function showLogDetails(logId) {
           )}">${log.status || "N/A"}</span>
         </div>
       </div>
+      ${
+        log.responseTime
+          ? `
+      <div class="log-detail-row">
+        <div class="log-detail-label">Response Time</div>
+        <div class="log-detail-value">${log.responseTime} ms</div>
+      </div>`
+          : ""
+      }
     </div>
   `
 
@@ -360,6 +388,19 @@ function showLogDetails(logId) {
     html += `</div>`
   }
 
+  // Add user agent info if available
+  if (log.userAgent) {
+    html += `
+      <div class="log-detail-group">
+        <h3><i class="fas fa-laptop"></i> Client Information</h3>
+        <div class="log-detail-row">
+          <div class="log-detail-label">User Agent</div>
+          <div class="log-detail-value">${log.userAgent}</div>
+        </div>
+      </div>
+    `
+  }
+
   // Add user data if available
   if (log.userId || log.user) {
     html += `
@@ -383,6 +424,11 @@ function showLogDetails(logId) {
     }
 
     html += `</div>`
+  }
+
+  // Add security analysis if relevant
+  if (shouldShowSecurityAnalysis(log)) {
+    html += generateSecurityAnalysisSection(log)
   }
 
   // Add stack trace for errors
@@ -427,6 +473,168 @@ function showLogDetails(logId) {
 
   content.innerHTML = html
   modal.style.display = "block"
+}
+
+/**
+ * Determine if security analysis section should be shown
+ */
+function shouldShowSecurityAnalysis(log) {
+  // Check for indicators that this might be security related
+  const securityKeywords = [
+    "failed login",
+    "sql injection",
+    "attack",
+    "invalid",
+    "unauthorized",
+    "forbidden",
+    "suspicious",
+    "brute force",
+    "invalid credentials",
+  ]
+
+  // Check if log is for a login failure, has 4xx status, or contains suspicious details
+  if (log.activity && log.activity.toLowerCase().includes("login failed"))
+    return true
+  if (log.activity && log.activity.toLowerCase().includes("sql injection"))
+    return true
+  if (log.activity && log.activity.toLowerCase().includes("scan")) return true
+  if (log.status >= 400) return true
+
+  // Check the log details for security-related keywords
+  if (log.details) {
+    const detailsLower = log.details.toLowerCase()
+    for (const keyword of securityKeywords) {
+      if (detailsLower.includes(keyword)) return true
+    }
+  }
+
+  // Check for suspicious user agent
+  if (
+    log.userAgent &&
+    (log.userAgent.includes("sqlmap") ||
+      log.userAgent.includes("nmap") ||
+      log.userAgent.includes("nikto") ||
+      log.userAgent.includes("burp"))
+  ) {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Generate security analysis section for log detail view
+ */
+function generateSecurityAnalysisSection(log) {
+  let hasRiskFactors = false
+  let riskHtml = ""
+
+  // Check for login failures
+  if (log.activity === "Login Failed") {
+    hasRiskFactors = true
+    riskHtml += `
+      <div class="security-risk-item">
+        <i class="fas fa-user-lock"></i>
+        <div class="risk-content">
+          <div class="risk-title">Failed Authentication</div>
+          <div class="risk-description">Failed login attempts may indicate password guessing or brute force attacks.</div>
+        </div>
+      </div>
+    `
+  }
+
+  // Check for SQL injection indicators
+  if (
+    log.activity === "SQL Injection Attempt" ||
+    (log.details && log.details.toLowerCase().includes("sql injection"))
+  ) {
+    hasRiskFactors = true
+    riskHtml += `
+      <div class="security-risk-item">
+        <i class="fas fa-database"></i>
+        <div class="risk-content">
+          <div class="risk-title">SQL Injection Attempt</div>
+          <div class="risk-description">Potential SQL injection attempt detected. This could be an attempt to extract or manipulate database data.</div>
+        </div>
+      </div>
+    `
+  }
+
+  // Check for suspicious user agent
+  if (
+    log.userAgent &&
+    (log.userAgent.includes("sqlmap") ||
+      log.userAgent.includes("nmap") ||
+      log.userAgent.includes("python-requests") ||
+      log.userAgent.includes("nuclei"))
+  ) {
+    hasRiskFactors = true
+    riskHtml += `
+      <div class="security-risk-item">
+        <i class="fas fa-robot"></i>
+        <div class="risk-content">
+          <div class="risk-title">Suspicious User Agent</div>
+          <div class="risk-description">User agent "${log.userAgent}" is associated with automated security tools or scanning.</div>
+        </div>
+      </div>
+    `
+  }
+
+  // Check for scanning activity
+  if (log.activity === "Endpoint Scan") {
+    hasRiskFactors = true
+    riskHtml += `
+      <div class="security-risk-item">
+        <i class="fas fa-search"></i>
+        <div class="risk-content">
+          <div class="risk-title">Endpoint Scanning</div>
+          <div class="risk-description">This request appears to be part of a pattern of scanning multiple endpoints, possibly searching for vulnerabilities.</div>
+        </div>
+      </div>
+    `
+  }
+
+  // Check for 4xx/5xx status codes
+  if (log.status >= 400) {
+    const statusCategory = log.status >= 500 ? "Server Error" : "Client Error"
+    const icon =
+      log.status >= 500 ? "fas fa-server" : "fas fa-exclamation-triangle"
+
+    hasRiskFactors = true
+    riskHtml += `
+      <div class="security-risk-item">
+        <i class="${icon}"></i>
+        <div class="risk-content">
+          <div class="risk-title">${statusCategory} (${log.status})</div>
+          <div class="risk-description">${
+            log.status === 401
+              ? "Unauthorized access attempt. Authentication failed."
+              : log.status === 403
+              ? "Forbidden access attempt. User attempted to access restricted resource."
+              : log.status === 404
+              ? "Resource not found. May indicate probing for non-existent resources."
+              : log.status === 500
+              ? "Server error occurred. May indicate vulnerability if triggered by malicious input."
+              : `HTTP ${log.status} response. May indicate problems with the request.`
+          }</div>
+        </div>
+      </div>
+    `
+  }
+
+  // Only add the section if there are risk factors to show
+  if (hasRiskFactors) {
+    return `
+      <div class="log-detail-group security-analysis">
+        <h3><i class="fas fa-shield-alt"></i> Security Analysis</h3>
+        <div class="security-risks">
+          ${riskHtml}
+        </div>
+      </div>
+    `
+  }
+
+  return ""
 }
 
 /**
