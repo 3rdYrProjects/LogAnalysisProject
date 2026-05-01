@@ -1,12 +1,21 @@
-const mongoose = require("mongoose")
+// models/Log.js  (or wherever you define it)
+const mongoose = require("mongoose");
 
 const logSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  activity: String,
-  ipAddress: String,
-  details: String,
   timestamp: { type: Date, default: Date.now },
+  userId: String,
+  ipAddress: String,
+  activity: String,
+  details: String,
+  status: Number,
+  method: String,
+  path: String,
+  level: {
+    type: String,
+    enum: ["debug", "info", "warn", "error"],
+    default: "info",
+  },
   transferred: { type: Boolean, default: false },
-})
+});
 
-module.exports = mongoose.model("Log", logSchema)
+module.exports = mongoose.model("Log", logSchema);

@@ -61,7 +61,7 @@ async function generateReport() {
   const includeErrors = document.getElementById("include-errors").checked;
   const includeSecurity = document.getElementById("include-security").checked;
   const includeRecommendations = document.getElementById(
-    "include-recommendations"
+    "include-recommendations",
   ).checked;
 
   // AI Summary + Recommendations
@@ -110,7 +110,7 @@ Logs sample: ${JSON.stringify(filteredLogs.slice(0, 50))}`;
       includeRecommendations,
       aiSummaryText,
       aiRecommendationText,
-    }
+    },
   );
 
   displayReport(reportContent);
@@ -120,13 +120,13 @@ Logs sample: ${JSON.stringify(filteredLogs.slice(0, 50))}`;
 function generateReportContent(title, dateRange, logs, options) {
   const totalRequests = logs.length;
   const uniqueIPs = new Set(
-    logs.filter((log) => log.ipAddress).map((log) => log.ipAddress)
+    logs.filter((log) => log.ipAddress).map((log) => log.ipAddress),
   ).size;
   const successRequests = logs.filter(
-    (log) => log.status >= 200 && log.status < 300
+    (log) => log.status >= 200 && log.status < 300,
   ).length;
   const clientErrors = logs.filter(
-    (log) => log.status >= 400 && log.status < 500
+    (log) => log.status >= 400 && log.status < 500,
   ).length;
   const serverErrors = logs.filter((log) => log.status >= 500).length;
   const successRate =
@@ -398,7 +398,7 @@ function generateReportContent(title, dateRange, logs, options) {
       <div class="section-description">
         ${(options.aiSummaryText || "No AI summary generated").replace(
           /\n/g,
-          "<br>"
+          "<br>",
         )}
       </div>
     </div>`;
@@ -510,19 +510,19 @@ function generateReportContent(title, dateRange, logs, options) {
       <h2>Security Analysis</h2>
       <div class="section-description">
         The system detected ${securityAlerts.length} potential security issue${
-      securityAlerts.length !== 1 ? "s" : ""
-    } during the analyzed period. These findings are ranked by severity and should be investigated further.
+          securityAlerts.length !== 1 ? "s" : ""
+        } during the analyzed period. These findings are ranked by severity and should be investigated further.
       </div>`;
 
     if (securityAlerts.length > 0) {
       const highAlerts = securityAlerts.filter(
-        (alert) => alert.severity === "high"
+        (alert) => alert.severity === "high",
       );
       const mediumAlerts = securityAlerts.filter(
-        (alert) => alert.severity === "medium"
+        (alert) => alert.severity === "medium",
       );
       const lowAlerts = securityAlerts.filter(
-        (alert) => alert.severity === "low"
+        (alert) => alert.severity === "low",
       );
 
       if (highAlerts.length > 0) {
@@ -539,7 +539,7 @@ function generateReportContent(title, dateRange, logs, options) {
           </div>
           <div class="alert-message">${alert.message}</div>
           <div class="alert-time">${new Date(
-            alert.timestamp
+            alert.timestamp,
           ).toLocaleString()}</div>
         </div>`;
         });
@@ -562,7 +562,7 @@ function generateReportContent(title, dateRange, logs, options) {
           </div>
           <div class="alert-message">${alert.message}</div>
           <div class="alert-time">${new Date(
-            alert.timestamp
+            alert.timestamp,
           ).toLocaleString()}</div>
         </div>`;
         });
@@ -585,7 +585,7 @@ function generateReportContent(title, dateRange, logs, options) {
           </div>
           <div class="alert-message">${alert.message}</div>
           <div class="alert-time">${new Date(
-            alert.timestamp
+            alert.timestamp,
           ).toLocaleString()}</div>
         </div>`;
         });
@@ -695,7 +695,7 @@ function generateRecommendations(logs, securityAlerts, metrics) {
 
   // SQL Injection alerts
   const sqlInjectionAlerts = securityAlerts.filter((alert) =>
-    alert.title.includes("SQL Injection")
+    alert.title.includes("SQL Injection"),
   );
 
   if (sqlInjectionAlerts.length > 0) {
@@ -709,7 +709,7 @@ function generateRecommendations(logs, securityAlerts, metrics) {
 
   // Brute force attempts
   const bruteForceAlerts = securityAlerts.filter((alert) =>
-    alert.title.includes("Brute Force")
+    alert.title.includes("Brute Force"),
   );
 
   if (bruteForceAlerts.length > 0) {
@@ -723,7 +723,7 @@ function generateRecommendations(logs, securityAlerts, metrics) {
 
   // Endpoint scanning
   const scanningAlerts = securityAlerts.filter((alert) =>
-    alert.title.includes("Endpoint Scanning")
+    alert.title.includes("Endpoint Scanning"),
   );
 
   if (scanningAlerts.length > 0) {

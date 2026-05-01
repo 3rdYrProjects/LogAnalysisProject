@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — CyberLog Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #050a14;
+        --surface: #0a1628;
+        --border: #1a2d4a;
+        --accent: #00d4ff;
+        --accent2: #7c3aed;
+        --danger: #ef4444;
+        --success: #10b981;
+        --text: #e2e8f0;
+        --muted: #64748b;
+      }
+
+      body {
+        background: var(--bg);
+        font-family: "Syne", sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        animation: gridShift 20s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes gridShift {
+        100% {
+          transform: translateY(60px);
+        }
+      }
+
+      .orb {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+      }
+      .orb-1 {
+        width: 400px;
+        height: 400px;
+        background: rgba(0, 212, 255, 0.07);
+        top: -100px;
+        right: -100px;
+      }
+      .orb-2 {
+        width: 300px;
+        height: 300px;
+        background: rgba(124, 58, 237, 0.08);
+        bottom: -80px;
+        left: -80px;
+      }
+
+      .auth-box {
+        width: 520px;
+        max-width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 0 60px rgba(0, 212, 255, 0.05);
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.5s ease;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .auth-box::before {
+        content: "";
+        display: block;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+      }
+
+      .auth-header {
+        padding: 36px 40px 0;
+        text-align: center;
+      }
+
+      .logo-icon {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+        margin: 0 auto 16px;
+      }
+
+      .form-title {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .form-subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 6px;
+        margin-bottom: 0;
+      }
+      .form-subtitle a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .auth-body {
+        padding: 28px 40px 36px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .field {
+        margin-bottom: 18px;
+      }
+
+      .field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input-wrap i.icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        font-size: 13px;
+        pointer-events: none;
+        transition: color 0.2s;
+      }
+
+      .input-wrap:focus-within i.icon {
+        color: var(--accent);
+      }
+
+      .input-wrap input,
+      .input-wrap select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px 12px 40px;
+        font-size: 14px;
+        font-family: "Syne", sans-serif;
+        color: var(--text);
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .input-wrap select option {
+        background: var(--surface);
+      }
+
+      .input-wrap input:focus,
+      .input-wrap select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 0;
+      }
+
+      .field-error {
+        font-size: 12px;
+        color: var(--danger);
+        margin-top: 5px;
+        display: none;
+      }
+      .field.has-error .input-wrap input,
+      .field.has-error .input-wrap select {
+        border-color: var(--danger);
+      }
+      .field.has-error .field-error {
+        display: block;
+      }
+
+      /* Password strength meter */
+      .strength-meter {
+        margin-top: 10px;
+      }
+      .strength-bars {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+      .strength-bar {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border);
+        transition: background 0.3s;
+      }
+      .strength-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-family: "Space Mono", monospace;
+      }
+
+      .strength-0 .strength-bar:nth-child(1) {
+        background: var(--danger);
+      }
+      .strength-1 .strength-bar:nth-child(-n + 2) {
+        background: #f59e0b;
+      }
+      .strength-2 .strength-bar:nth-child(-n + 3) {
+        background: #eab308;
+      }
+      .strength-3 .strength-bar {
+        background: var(--success);
+      }
+
+      .alert-box {
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 18px;
+        display: none;
+        align-items: center;
+        gap: 10px;
+      }
+      .alert-box.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+        display: flex;
+      }
+      .alert-box.success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #6ee7b7;
+        display: flex;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent2), #9d4edd);
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: "Syne", sans-serif;
+        color: #fff;
+        cursor: pointer;
+        transition:
+          opacity 0.2s,
+          transform 0.1s,
+          box-shadow 0.2s;
+        box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+        margin-top: 4px;
+      }
+
+      .btn-submit:hover {
+        opacity: 0.9;
+        box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+      }
+      .btn-submit:active {
+        transform: scale(0.98);
+      }
+      .btn-submit.loading {
+        pointer-events: none;
+        opacity: 0.7;
+      }
+
+      .spinner-wrap {
+        display: none;
+      }
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin: 0 auto;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .btn-submit.loading .btn-text {
+        display: none;
+      }
+      .btn-submit.loading .spinner-wrap {
+        display: block;
+      }
+
+      .terms-note {
+        text-align: center;
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+
+      .terms-note a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="auth-box">
+      <div class="auth-header">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="form-title">Create Account</div>
+        <div class="form-subtitle">
+          Already registered? <a href="login.html">Sign in</a>
+        </div>
+      </div>
+
+      <div class="auth-body">
+        <div id="alert-box" class="alert-box">
+          <i class="fas fa-circle-exclamation"></i>
+          <span id="alert-message"></span>
+        </div>
+
+        <form id="register-form" novalidate>
+          <div class="field-row">
+            <div class="field" id="field-username">
+              <label>Username</label>
+              <div class="input-wrap">
+                <i class="fas fa-at icon"></i>
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="johndoe"
+                  autocomplete="username"
+                />
+              </div>
+              <div class="field-error" id="err-username"></div>
+            </div>
+
+            <div class="field" id="field-role">
+              <label>Access Role</label>
+              <div class="input-wrap">
+                <i class="fas fa-user-shield icon"></i>
+                <select id="role">
+                  <option value="viewer">Viewer</option>
+                  <option value="analyst">Analyst</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="field-email">
+            <label>Email Address</label>
+            <div class="input-wrap">
+              <i class="fas fa-envelope icon"></i>
+              <input
+                type="email"
+                id="email"
+                placeholder="john@cyberlog.io"
+                autocomplete="email"
+              />
+            </div>
+            <div class="field-error" id="err-email"></div>
+          </div>
+
+          <div class="field" id="field-password">
+            <label>Password</label>
+            <div class="input-wrap">
+              <i class="fas fa-lock icon"></i>
+              <input
+                type="password"
+                id="password"
+                placeholder="Min 8 chars, mixed case + symbol"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                onclick="togglePass('password', this)"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="strength-meter">
+              <div class="strength-bars" id="strength-bars">
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+                <div class="strength-bar"></div>
+              </div>
+              <div class="strength-label" id="strength-label">
+                Enter a password
+              </div>
+            </div>
+            <div class="field-error" id="err-password"></div>
+          </div>
+
+          <div class="field" id="field-confirm">
+            <label>Confirm Password</label>
+            <div class="input-wrap">
+              <i class="fas fa-lock-open icon"></i>
+              <input
+                type="password"
+                id="confirm"
+                placeholder="Repeat password"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                onclick="togglePass('confirm', this)"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="field-error" id="err-confirm"></div>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <span class="btn-text">Create Account</span>
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </button>
+        </form>
+
+        <div class="terms-note">
+          By creating an account you agree to the<br />
+          <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API = "http://localhost:4000";
+
+      function togglePass(id, btn) {
+        const input = document.getElementById(id);
+        const hidden = input.type === "password";
+        input.type = hidden ? "text" : "password";
+        btn.querySelector("i").className = hidden
+          ? "fas fa-eye-slash"
+          : "fas fa-eye";
+      }
+
+      function showAlert(msg, type = "error") {
+        const box = document.getElementById("alert-box");
+        box.className = `alert-box ${type}`;
+        document.getElementById("alert-message").textContent = msg;
+      }
+
+      function clearAlert() {
+        document.getElementById("alert-box").className = "alert-box";
+      }
+
+      function setFieldError(fieldId, errId, msg) {
+        document.getElementById(fieldId).classList.toggle("has-error", !!msg);
+        document.getElementById(errId).textContent = msg || "";
+      }
+
+      function clearErrors() {
+        [
+          "field-username",
+          "field-email",
+          "field-password",
+          "field-confirm",
+        ].forEach((id) => {
+          document.getElementById(id).classList.remove("has-error");
+        });
+        ["err-username", "err-email", "err-password", "err-confirm"].forEach(
+          (id) => {
+            document.getElementById(id).textContent = "";
+          },
+        );
+      }
+
+      // Password strength
+      const strengthLabels = ["Weak", "Fair", "Good", "Strong"];
+      const strengthColors = ["#ef4444", "#f59e0b", "#eab308", "#10b981"];
+
+      document
+        .getElementById("password")
+        .addEventListener("input", function () {
+          const val = this.value;
+          let score = 0;
+          if (val.length >= 8) score++;
+          if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+          if (/\d/.test(val)) score++;
+          if (/[^A-Za-z\d]/.test(val)) score++;
+
+          const bars = document.getElementById("strength-bars");
+          bars.className = `strength-bars strength-${score}`;
+          const label = document.getElementById("strength-label");
+          if (val.length === 0) {
+            label.textContent = "Enter a password";
+            label.style.color = "";
+            bars.className = "strength-bars";
+          } else {
+            label.textContent = strengthLabels[score - 1] || "Very weak";
+            label.style.color = strengthColors[score - 1] || "#ef4444";
+          }
+        });
+
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          clearErrors();
+          clearAlert();
+
+          const username = document.getElementById("username").value.trim();
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+          const confirm = document.getElementById("confirm").value;
+          const role = document.getElementById("role").value;
+
+          let valid = true;
+
+          if (!username || username.length < 3) {
+            setFieldError(
+              "field-username",
+              "err-username",
+              "Username must be at least 3 characters.",
+            );
+            valid = false;
+          }
+
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setFieldError(
+              "field-email",
+              "err-email",
+              "Please enter a valid email address.",
+            );
+            valid = false;
+          }
+
+          const strongPwd =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/.test(
+              password,
+            );
+          if (!strongPwd) {
+            setFieldError(
+              "field-password",
+              "err-password",
+              "Password needs 8+ chars, uppercase, lowercase, number, and symbol.",
+            );
+            valid = false;
+          }
+
+          if (password !== confirm) {
+            setFieldError(
+              "field-confirm",
+              "err-confirm",
+              "Passwords do not match.",
+            );
+            valid = false;
+          }
+
+          if (!valid) return;
+
+          const btn = document.getElementById("submit-btn");
+          btn.classList.add("loading");
+
+          try {
+            const res = await fetch(`${API}/api/auth/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, email, password, role }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              showAlert(data.error || "Registration failed.");
+              btn.classList.remove("loading");
+              return;
+            }
+
+            showAlert("Account created! Redirecting to login...", "success");
+            setTimeout(() => (window.location.href = "login.html"), 1800);
+          } catch (err) {
+            showAlert("Network error. Please try again.");
+            btn.classList.remove("loading");
+          }
+        });
+
+      if (sessionStorage.getItem("accessToken"))
+        window.location.href = "/dashboard";
+    </script>
+  </body>
+</html>
